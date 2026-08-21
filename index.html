@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Petite Mort — Post-purchase email set</title>
+<style>
+  :root{--ink:#2c2d2e;--ink70:#57585a;--ink45:#8a8a8a;--terra:#b8543d;--blush:#f3d6cd;
+        --shell:#efeae6;--paper:#fff;--hair:#ebe6e3;--sand:#faf7f5}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--shell);color:var(--ink);
+       font:15px/1.6 Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  .wrap{max-width:1080px;margin:0 auto;padding:56px 24px 80px}
+  .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink45);font-weight:600}
+  h1{font-size:38px;line-height:1.15;letter-spacing:-.02em;margin:14px 0 0;font-weight:600}
+  .lede{margin:16px 0 0;max-width:60ch;color:var(--ink70)}
+  .status{margin:28px 0 0;background:var(--blush);border-left:4px solid var(--terra);
+          border-radius:14px;padding:20px 24px;max-width:70ch}
+  .status b{color:var(--terra)}
+  .grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));margin-top:40px}
+  .card{background:var(--paper);border-radius:16px;padding:24px;border:1px solid var(--hair);
+        display:flex;flex-direction:column}
+  .card h2{font-size:18px;margin:0;letter-spacing:-.01em}
+  .card .trig{font-size:12px;color:var(--ink45);margin-top:6px}
+  .card p{font-size:13.5px;color:var(--ink70);margin:12px 0 0;flex:1}
+  .links{margin-top:18px;display:flex;gap:8px;flex-wrap:wrap}
+  a.btn{display:inline-block;padding:9px 16px;border-radius:25px;font-size:12.5px;
+        font-weight:600;text-decoration:none}
+  a.primary{background:var(--ink);color:#fff}
+  a.ghost{background:var(--sand);color:var(--ink);border:1px solid var(--hair)}
+  .note{margin-top:12px;font-size:12px;color:var(--terra)}
+  footer{margin-top:56px;padding-top:24px;border-top:1px solid var(--hair);
+         font-size:12.5px;color:var(--ink45)}
+  h3{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink45);
+     margin:48px 0 0;font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Petite Mort · Direction A — Warm Editorial</div>
+  <h1>The post-purchase email set</h1>
+  <p class="lede">Seven transactional emails covering the whole journey from checkout to
+  refund, all in the approved Direction A language. Each one has a browser preview with
+  sample data and a production Shopify Liquid template beside it.</p>
+
+  <div class="status">
+    <b>Nothing here is live.</b> No Shopify notification template has been changed. These
+    are staged for review — Shopify has no draft state for transactional notifications, so
+    the repo <em>is</em> the draft. See <a href="INSTALL-RUNBOOK.md" style="color:var(--terra)">INSTALL-RUNBOOK.md</a>
+    before pasting anything.
+  </div>
+
+  <h3>Order</h3>
+  <div class="grid">
+    <div class="card">
+      <h2>Order confirmation</h2>
+      <div class="trig">Fires on order paid · highest volume</div>
+      <p>Delivery window, four-step progress rail, itemised totals with VAT split, the
+      gift-card promise, and the four FAQs that remove the most support tickets.</p>
+      <div class="links">
+        <a class="primary" href="order-confirmation/direction-a-warm-editorial.html">Preview</a>
+        <a class="ghost" href="order-confirmation/shopify.liquid">Liquid</a>
+      </div>
+      <div class="note">Approved</div>
+    </div>
+
+    <div class="card">
+      <h2>Order cancelled</h2>
+      <div class="trig">Fires when an order is cancelled</div>
+      <p>Leads with where the money goes and when. Adapts when there is no payment to
+      return. Muted panel rather than the warm blush — bad news in a celebratory tint
+      reads as tone-deaf.</p>
+      <div class="links">
+        <a class="primary" href="order-cancelled/direction-a-warm-editorial.html">Preview</a>
+        <a class="ghost" href="order-cancelled/shopify.liquid">Liquid</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Refund notification</h2>
+      <div class="trig">Fires on every refund, full or partial</div>
+      <p>Exact amount, which account it returns to, the date it should land, and a
+      three-step bank-processing rail. Detects partial refunds and states what is still
+      paid, so a partial never reads as a full reversal.</p>
+      <div class="links">
+        <a class="primary" href="refund/direction-a-warm-editorial.html">Preview</a>
+        <a class="ghost" href="refund/shopify.liquid">Liquid</a>
+      </div>
+    </div>
+  </div>
+
+  <h3>Shipping</h3>
+  <div class="grid">
+    <div class="card">
+      <h2>Shipping confirmation</h2>
+      <div class="trig">Fires on fulfilment · second highest volume</div>
+      <p>Arrival window recalculated from despatch, carrier and tracking number, and the
+      contents of this specific parcel. Detects a partial shipment and says the rest is
+      coming separately.</p>
+      <div class="links">
+        <a class="primary" href="shipping-confirmation/direction-a-warm-editorial.html">Preview</a>
+        <a class="ghost" href="shipping-confirmation/shopify.liquid">Liquid</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Shipping update</h2>
+      <div class="trig">Fires when tracking changes</div>
+      <p>Gives a revised window and a hard commitment: if it hasn't arrived by a stated
+      date we open the claim ourselves. Says plainly that cancelling for a full refund is
+      still available mid-transit.</p>
+      <div class="links">
+        <a class="primary" href="shipping-update/direction-a-warm-editorial.html">Preview</a>
+        <a class="ghost" href="shipping-update/shopify.liquid">Liquid</a>
+      </div>
+      <div class="note">Two design elements dropped — see runbook</div>
+    </div>
+
+    <div class="card">
+      <h2>Out for delivery</h2>
+      <div class="trig">Fires on the courier's out-for-delivery scan</div>
+      <p>Short by design. Arriving today, no signature needed, and what happens if nobody
+      is home — the three things a customer wants at that moment.</p>
+      <div class="links">
+        <a class="primary" href="out-for-delivery/direction-a-warm-editorial.html">Preview</a>
+        <a class="ghost" href="out-for-delivery/shopify.liquid">Liquid</a>
+      </div>
+      <div class="note">Carrier-dependent — may not fire on every market</div>
+    </div>
+
+    <div class="card">
+      <h2>Delivered</h2>
+      <div class="trig">Fires on the delivery scan</div>
+      <p>The one email with room to sell. Names the €10 gift card, gives three genuine
+      fragrance-care tips, asks for a view, and puts "delivered but I have nothing" at the
+      top of the FAQs where it belongs.</p>
+      <div class="links">
+        <a class="primary" href="delivered/direction-a-warm-editorial.html">Preview</a>
+        <a class="ghost" href="delivered/shopify.liquid">Liquid</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Design tokens: <a href="_shared/DESIGN-TOKENS.md" style="color:var(--ink70)">_shared/DESIGN-TOKENS.md</a> ·
+    Install and automation: <a href="INSTALL-RUNBOOK.md" style="color:var(--ink70)">INSTALL-RUNBOOK.md</a><br>
+    Palette and geometry pulled from the live theme, not invented. Every Liquid template
+    render-tested across 11 data permutations including partial shipment, unpaid
+    cancellation and partial refund.
+  </footer>
+</div>
+</body>
+</html>

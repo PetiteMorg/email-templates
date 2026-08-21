@@ -1,0 +1,284 @@
+{%- comment -%}
+  Petite Mort — ORDER CONFIRMATION
+  Direction A (Warm Editorial). Paste into Settings → Notifications → Order confirmation.
+  Tokens: _shared/DESIGN-TOKENS.md · Install: INSTALL-RUNBOOK.md
+  Shopify notification scope is flat: line_items / subtotal_price / shipping_address,
+  NOT order.line_items. Do not "fix" that.
+{%- endcomment -%}
+
+{%- comment -%} ── Delivery window. Computed here because the store has no carrier
+  accounts and Estimated delivery dates is OFF, so Shopify supplies no estimate.
+  Lead times are OUR promise per market. Edit the case block, nothing else. ── {%- endcomment -%}
+{%- assign lead_min = 4 -%}
+{%- assign lead_max = 7 -%}
+{%- assign dest = shipping_address.country_code | default: 'XX' -%}
+{%- case dest -%}
+  {%- when 'NL' -%}{%- assign lead_min = 1 -%}{%- assign lead_max = 2 -%}
+  {%- when 'BE' -%}{%- assign lead_min = 2 -%}{%- assign lead_max = 3 -%}
+  {%- when 'DE' -%}{%- assign lead_min = 2 -%}{%- assign lead_max = 3 -%}
+  {%- when 'SE' -%}{%- assign lead_min = 3 -%}{%- assign lead_max = 5 -%}
+  {%- when 'DK' -%}{%- assign lead_min = 3 -%}{%- assign lead_max = 5 -%}
+  {%- when 'IE' -%}{%- assign lead_min = 3 -%}{%- assign lead_max = 5 -%}
+  {%- when 'PL' -%}{%- assign lead_min = 3 -%}{%- assign lead_max = 5 -%}
+  {%- when 'FI' -%}{%- assign lead_min = 4 -%}{%- assign lead_max = 6 -%}
+{%- endcase -%}
+{%- assign secs_min = lead_min | times: 86400 -%}
+{%- assign secs_max = lead_max | times: 86400 -%}
+{%- assign base_ts = created_at | date: '%s' -%}
+{%- assign ts_from = base_ts | plus: secs_min -%}
+{%- assign ts_to = base_ts | plus: secs_max -%}
+{%- comment -%} Push a weekend endpoint to the Monday. None of these markets get Saturday
+  or Sunday delivery, and printing a weekend date is how a promise becomes a ticket.
+  %w is 0=Sunday .. 6=Saturday; times:1 forces the string to an integer for comparison. {%- endcomment -%}
+{%- assign dow = ts_from | date: '%w' | times: 1 -%}
+{%- if dow == 6 -%}{%- assign ts_from = ts_from | plus: 172800 -%}{%- elsif dow == 0 -%}{%- assign ts_from = ts_from | plus: 86400 -%}{%- endif -%}
+{%- assign dow = ts_to | date: '%w' | times: 1 -%}
+{%- if dow == 6 -%}{%- assign ts_to = ts_to | plus: 172800 -%}{%- elsif dow == 0 -%}{%- assign ts_to = ts_to | plus: 86400 -%}{%- endif -%}
+{%- if ts_to < ts_from -%}{%- assign ts_to = ts_from -%}{%- endif -%}
+{%- assign day_from = ts_from | date: '%Y%m%d' -%}
+{%- assign day_to = ts_to | date: '%Y%m%d' -%}
+{%- if day_from == day_to -%}
+{%- assign eta_window = ts_to | date: '%a %-d %B' -%}
+{%- else -%}
+{%- assign part_from = ts_from | date: '%a %-d' -%}
+{%- assign part_to = ts_to | date: '%a %-d %B' -%}
+{%- assign eta_window = part_from | append: ' – ' | append: part_to -%}
+{%- endif -%}
+{%- assign buyer = customer.first_name | default: billing_address.first_name | default: shipping_address.first_name -%}
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{ shop_name }} — Order {{ order_name }}</title>
+</head>
+<body style="margin:0;padding:0;background:#efeae6;">
+
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Order {{ order_name }} confirmed — arriving {{ eta_window }}. Your thank-you card and €10 gift card are in the box.</div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#efeae6;">
+<tr><td align="center" style="padding:28px 12px 44px;">
+
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:100%;background:#ffffff;border-radius:16px;overflow:hidden;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+
+  <tr><td style="padding:34px 40px 0;" align="center">
+    <img src="https://petitemort.co/cdn/shop/files/PM_Logo1_Black_1.png" width="132" alt="{{ shop_name }}" style="display:block;border:0;width:132px;height:auto;">
+  </td></tr>
+
+  <tr><td style="padding:26px 40px 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8a8a8a;">Order {{ order_name }}</td>
+        <td align="right" style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8a8a8a;">{{ created_at | date: '%-d %B %Y' }}</td>
+      </tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:30px 40px 0;">
+    <h1 style="margin:0;font-size:30px;line-height:1.2;font-weight:600;color:#2c2d2e;letter-spacing:-.02em;">Thank you{% if buyer %}, {{ buyer }}{% endif %}.</h1>
+    <p style="margin:14px 0 0;font-size:15px;line-height:1.65;color:#57585a;">
+      Your order is confirmed and we&rsquo;re preparing it now. Everything below is yours to keep —
+      no need to reply, but we&rsquo;re here if you need us.
+    </p>
+  </td></tr>
+
+  {%- if requires_shipping and shipping_address -%}
+  <tr><td style="padding:26px 40px 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3d6cd;border-radius:14px;">
+      <tr><td style="padding:22px 24px;border-left:4px solid #b8543d;border-radius:14px;">
+        <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#b8543d;font-weight:600;">Estimated delivery</div>
+        <div style="margin-top:7px;font-size:22px;font-weight:600;color:#2c2d2e;letter-spacing:-.01em;">{{ eta_window }}</div>
+        <div style="margin-top:8px;font-size:13.5px;line-height:1.6;color:#7a5348;">
+          Standard delivery to {{ shipping_address.country }}. We&rsquo;ll email you a tracking link the moment it leaves our warehouse.
+        </div>
+      </td></tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:30px 40px 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td width="25%" align="center" style="padding-bottom:9px;"><div style="width:11px;height:11px;border-radius:50%;background:#b8543d;margin:0 auto;"></div></td>
+        <td width="25%" align="center" style="padding-bottom:9px;"><div style="width:11px;height:11px;border-radius:50%;background:#e0d5d0;margin:0 auto;"></div></td>
+        <td width="25%" align="center" style="padding-bottom:9px;"><div style="width:11px;height:11px;border-radius:50%;background:#e0d5d0;margin:0 auto;"></div></td>
+        <td width="25%" align="center" style="padding-bottom:9px;"><div style="width:11px;height:11px;border-radius:50%;background:#e0d5d0;margin:0 auto;"></div></td>
+      </tr>
+      <tr><td colspan="4" style="padding:0 12%;"><div style="height:2px;background:#e8e0dc;font-size:0;line-height:0;">&nbsp;</div></td></tr>
+      <tr>
+        <td align="center" style="padding-top:11px;font-size:11.5px;font-weight:600;color:#b8543d;">Confirmed</td>
+        <td align="center" style="padding-top:11px;font-size:11.5px;color:#a3a3a3;">Packed</td>
+        <td align="center" style="padding-top:11px;font-size:11.5px;color:#a3a3a3;">Shipped</td>
+        <td align="center" style="padding-top:11px;font-size:11.5px;color:#a3a3a3;">Delivered</td>
+      </tr>
+    </table>
+  </td></tr>
+  {%- endif -%}
+
+  <tr><td style="padding:28px 40px 0;" align="center">
+    <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+      <td style="background:#2c2d2e;border-radius:25px;">
+        <a href="{{ order_status_url }}" style="display:inline-block;padding:15px 40px;font-size:14.5px;font-weight:600;color:#ffffff;text-decoration:none;letter-spacing:.01em;">View your order</a>
+      </td>
+    </tr></table>
+    <div style="margin-top:13px;font-size:13px;color:#8a8a8a;">or <a href="{{ shop.url }}" style="color:#b8543d;text-decoration:underline;">continue shopping</a></div>
+  </td></tr>
+
+  <tr><td style="padding:32px 40px 0;"><div style="height:1px;background:#ebe6e3;font-size:0;">&nbsp;</div></td></tr>
+
+  <tr><td style="padding:26px 40px 0;">
+    <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8a8a8a;font-weight:600;">Your order</div>
+  </td></tr>
+
+  {%- for line in line_items -%}
+  <tr><td style="padding:18px 40px 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td width="62" valign="top">
+          {%- if line.image -%}
+          <img src="{{ line | img_url: 'compact' }}" width="62" alt="{{ line.title | escape }}" style="display:block;border:1px solid #ede7e4;border-radius:10px;width:62px;height:auto;">
+          {%- else -%}
+          <div style="width:62px;height:62px;border-radius:10px;background:#f6f2f0;border:1px solid #ede7e4;"></div>
+          {%- endif -%}
+        </td>
+        <td valign="top" style="padding-left:16px;">
+          <div style="font-size:14.5px;font-weight:600;color:#2c2d2e;">{{ line.product.title | default: line.title }}</div>
+          <div style="margin-top:3px;font-size:12.5px;color:#8a8a8a;">
+            {%- if line.variant.title and line.variant.title != 'Default Title' -%}{{ line.variant.title }} &nbsp;·&nbsp; {%- endif -%}
+            Qty {{ line.quantity }}
+          </div>
+          {%- if line.selling_plan_allocation -%}
+          <div style="margin-top:3px;font-size:12px;color:#b8543d;">{{ line.selling_plan_allocation.selling_plan.name }}</div>
+          {%- endif -%}
+        </td>
+        <td align="right" valign="top" style="font-size:14.5px;font-weight:600;color:#2c2d2e;white-space:nowrap;">{{ line.final_line_price | money }}</td>
+      </tr>
+    </table>
+  </td></tr>
+  {%- endfor -%}
+
+  <tr><td style="padding:20px 40px 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#faf7f5;border-radius:12px;">
+      <tr><td style="padding:15px 18px;">
+        <div style="font-size:12.5px;font-weight:600;color:#2c2d2e;">Included in your box, on us</div>
+        <div style="margin-top:6px;font-size:12.5px;line-height:1.6;color:#7c7c7c;">
+          A handwritten thank-you card &nbsp;·&nbsp; A &euro;10 gift card for your next order
+        </div>
+      </td></tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:24px 40px 0;">
+    <div style="height:1px;background:#ebe6e3;font-size:0;">&nbsp;</div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:18px;">
+      <tr><td style="font-size:13.5px;color:#6f6f6f;padding-bottom:9px;">Subtotal</td><td align="right" style="font-size:13.5px;color:#2c2d2e;padding-bottom:9px;">{{ subtotal_price | money }}</td></tr>
+
+      {%- for discount in discount_applications -%}
+        {%- if discount.total_allocated_amount > 0 -%}
+        <tr>
+          <td style="font-size:13.5px;color:#b8543d;padding-bottom:9px;">Discount{% if discount.title %} &nbsp;<span style="background:#f3d6cd;border-radius:4px;padding:2px 7px;font-size:11px;font-weight:600;">{{ discount.title }}</span>{% endif %}</td>
+          <td align="right" style="font-size:13.5px;color:#b8543d;padding-bottom:9px;">&minus; {{ discount.total_allocated_amount | money }}</td>
+        </tr>
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- if requires_shipping -%}
+      <tr><td style="font-size:13.5px;color:#6f6f6f;padding-bottom:9px;">Shipping</td><td align="right" style="font-size:13.5px;color:#2c2d2e;padding-bottom:9px;">{% if shipping_price > 0 %}{{ shipping_price | money }}{% else %}Free{% endif %}</td></tr>
+      {%- endif -%}
+
+      {%- if tax_price > 0 -%}
+      <tr><td style="font-size:12.5px;color:#9a9a9a;padding-bottom:14px;">VAT included</td><td align="right" style="font-size:12.5px;color:#9a9a9a;padding-bottom:14px;">{{ tax_price | money }}</td></tr>
+      {%- endif -%}
+
+      <tr><td style="border-top:1px solid #ebe6e3;padding-top:14px;font-size:16px;font-weight:600;color:#2c2d2e;">Total</td><td align="right" style="border-top:1px solid #ebe6e3;padding-top:14px;font-size:16px;font-weight:600;color:#2c2d2e;">{{ total_price | money }}</td></tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:28px 40px 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        {%- if requires_shipping and shipping_address -%}
+        <td width="50%" valign="top" style="padding-right:12px;">
+          <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8a8a8a;font-weight:600;">Shipping to</div>
+          <div style="margin-top:9px;font-size:13.5px;line-height:1.7;color:#57585a;">
+            {{ shipping_address.name }}<br>
+            {{ shipping_address.address1 }}<br>
+            {%- if shipping_address.address2 != blank -%}{{ shipping_address.address2 }}<br>{%- endif -%}
+            {{ shipping_address.zip }} {{ shipping_address.city }}<br>
+            {{ shipping_address.country }}
+          </div>
+        </td>
+        {%- endif -%}
+        <td width="50%" valign="top" style="padding-left:12px;">
+          <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8a8a8a;font-weight:600;">Paid with</div>
+          <div style="margin-top:9px;font-size:13.5px;line-height:1.7;color:#57585a;">
+            {%- for transaction in transactions -%}
+              {%- if transaction.status == 'success' and transaction.kind != 'refund' -%}
+                {%- if transaction.payment_details.credit_card_company -%}
+                  {{ transaction.payment_details.credit_card_company }} &bull;&bull;&bull;&bull; {{ transaction.payment_details.credit_card_last_four_digits }}<br>
+                {%- else -%}
+                  {{ transaction.gateway_display_name | default: transaction.gateway }}<br>
+                {%- endif -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {{ total_price | money }}<br><span style="color:#9a9a9a;">{{ created_at | date: '%-d %b %Y' }}</span>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:32px 40px 0;">
+    <div style="height:1px;background:#ebe6e3;font-size:0;">&nbsp;</div>
+    <div style="margin-top:24px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8a8a8a;font-weight:600;">Questions we usually get</div>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;">
+      <tr><td style="padding-bottom:15px;">
+        <div style="font-size:13.5px;font-weight:600;color:#2c2d2e;">When will it ship?</div>
+        <div style="margin-top:4px;font-size:13px;line-height:1.6;color:#7c7c7c;">Within 1&ndash;2 working days. You&rsquo;ll get a tracking link by email as soon as it&rsquo;s on its way.</div>
+      </td></tr>
+      <tr><td style="padding-bottom:15px;">
+        <div style="font-size:13.5px;font-weight:600;color:#2c2d2e;">Can I still change my address?</div>
+        <div style="margin-top:4px;font-size:13px;line-height:1.6;color:#7c7c7c;">Yes, if the order hasn&rsquo;t shipped. Reply to this email with your order number and the new address.</div>
+      </td></tr>
+      <tr><td style="padding-bottom:15px;">
+        <div style="font-size:13.5px;font-weight:600;color:#2c2d2e;">What if I change my mind?</div>
+        <div style="margin-top:4px;font-size:13px;line-height:1.6;color:#7c7c7c;">You have 30 days to return anything, opened or not. We&rsquo;ll send a return label.</div>
+      </td></tr>
+      <tr><td>
+        <div style="font-size:13.5px;font-weight:600;color:#2c2d2e;">Why does my order show more items than I ordered?</div>
+        <div style="margin-top:4px;font-size:13px;line-height:1.6;color:#7c7c7c;">Sets are packed as individual bottles so each one is tracked properly. Nothing extra has been charged.</div>
+      </td></tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:26px 40px 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#2c2d2e;border-radius:14px;">
+      <tr><td style="padding:24px 26px;">
+        <div style="font-size:15px;font-weight:600;color:#ffffff;">Still need a hand?</div>
+        <div style="margin-top:7px;font-size:13.5px;line-height:1.65;color:#b9bbbd;">
+          Reply to this email or write to <a href="mailto:info@petitemort.co" style="color:#f3d6cd;text-decoration:underline;">info@petitemort.co</a>.<br>
+          We answer within one working day, Monday to Friday.
+        </div>
+      </td></tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:30px 40px 38px;" align="center">
+    <div style="font-size:12.5px;line-height:1.7;color:#9a9a9a;">
+      <a href="{{ shop.url }}/policies/shipping-policy" style="color:#7c7c7c;text-decoration:none;">Shipping</a> &nbsp;·&nbsp;
+      <a href="{{ shop.url }}/policies/refund-policy" style="color:#7c7c7c;text-decoration:none;">Returns</a> &nbsp;·&nbsp;
+      <a href="{{ shop.url }}/pages/contact" style="color:#7c7c7c;text-decoration:none;">Contact</a> &nbsp;·&nbsp;
+      <a href="{{ order_status_url }}" style="color:#7c7c7c;text-decoration:none;">Track order</a>
+    </div>
+    <div style="margin-top:16px;font-size:11.5px;line-height:1.7;color:#b4b4b4;">
+      {{ shop_name }} &nbsp;·&nbsp; Instraat 13, 6021 AC Budel, Netherlands<br>
+      This is an order confirmation for order {{ order_name }}.
+    </div>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>

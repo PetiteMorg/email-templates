@@ -1,0 +1,175 @@
+{%- comment -%}
+  Petite Mort — DELIVERED
+  Direction A (Warm Editorial). Settings → Notifications → Delivered.
+
+  DELIBERATE OMISSION vs the design preview: Shopify exposes no signatory name and no
+  carrier delivery timestamp in this scope. fulfillment.updated_at is the closest real
+  proxy for "when" and is used below; "signed for by …" is dropped, not faked.
+{%- endcomment -%}
+
+{%- assign buyer = customer.first_name | default: shipping_address.first_name -%}
+{%- assign delivered_ts = fulfillment.updated_at | default: fulfillment.created_at -%}
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{ shop_name }} — Order {{ order_name }} delivered</title>
+</head>
+<body style="margin:0;padding:0;background:#efeae6;">
+
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Order {{ order_name }} has been delivered. Your €10 gift card is in the box.</div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#efeae6;">
+<tr><td align="center" style="padding:28px 12px 44px;">
+
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:100%;background:#ffffff;border-radius:16px;overflow:hidden;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+
+  <tr><td style="padding:34px 40px 0;" align="center">
+    <img src="https://petitemort.co/cdn/shop/files/PM_Logo1_Black_1.png" width="132" alt="{{ shop_name }}" style="display:block;border:0;width:132px;height:auto;">
+  </td></tr>
+
+  <tr><td style="padding:26px 40px 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8a8a8a;">Order {{ order_name }}</td>
+        <td align="right" style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8a8a8a;">Delivered {{ delivered_ts | date: '%-d %B' }}</td>
+      </tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:30px 40px 0;">
+    <h1 style="margin:0;font-size:30px;line-height:1.2;font-weight:600;color:#2c2d2e;letter-spacing:-.02em;">It&rsquo;s arrived.</h1>
+    <p style="margin:14px 0 0;font-size:15px;line-height:1.65;color:#57585a;">
+      {% if buyer %}{{ buyer }}, your{% else %}Your{% endif %} parcel has been delivered. We hope you love it &mdash; and if you
+      don&rsquo;t, that&rsquo;s genuinely fine, everything below tells you how to put it right.
+    </p>
+  </td></tr>
+
+  <tr><td style="padding:26px 40px 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3d6cd;border-radius:14px;">
+      <tr><td style="padding:22px 24px;border-left:4px solid #b8543d;border-radius:14px;">
+        <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#b8543d;font-weight:600;">Delivered</div>
+        <div style="margin-top:7px;font-size:22px;font-weight:600;color:#2c2d2e;letter-spacing:-.01em;">{{ delivered_ts | date: '%a %-d %B, %H:%M' }}</div>
+        {%- if shipping_address -%}
+        <div style="margin-top:8px;font-size:13.5px;line-height:1.6;color:#7a5348;">
+          Handed over at {{ shipping_address.address1 }}, {{ shipping_address.city }}.
+        </div>
+        {%- endif -%}
+      </td></tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:30px 40px 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td width="25%" align="center" style="padding-bottom:9px;"><div style="width:11px;height:11px;border-radius:50%;background:#b8543d;margin:0 auto;"></div></td>
+        <td width="25%" align="center" style="padding-bottom:9px;"><div style="width:11px;height:11px;border-radius:50%;background:#b8543d;margin:0 auto;"></div></td>
+        <td width="25%" align="center" style="padding-bottom:9px;"><div style="width:11px;height:11px;border-radius:50%;background:#b8543d;margin:0 auto;"></div></td>
+        <td width="25%" align="center" style="padding-bottom:9px;"><div style="width:15px;height:15px;border-radius:50%;background:#b8543d;border:3px solid #f3d6cd;margin:0 auto;"></div></td>
+      </tr>
+      <tr><td colspan="4" style="padding:0 12%;"><div style="height:2px;background:#b8543d;font-size:0;line-height:0;">&nbsp;</div></td></tr>
+      <tr>
+        <td align="center" style="padding-top:11px;font-size:11.5px;color:#a3a3a3;">Confirmed</td>
+        <td align="center" style="padding-top:11px;font-size:11.5px;color:#a3a3a3;">Packed</td>
+        <td align="center" style="padding-top:11px;font-size:11.5px;color:#a3a3a3;">Shipped</td>
+        <td align="center" style="padding-top:11px;font-size:11.5px;font-weight:600;color:#b8543d;">Delivered</td>
+      </tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:30px 40px 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#2c2d2e;border-radius:14px;">
+      <tr><td style="padding:26px;">
+        <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#f3d6cd;font-weight:600;">In your box</div>
+        <div style="margin-top:9px;font-size:20px;font-weight:600;color:#ffffff;letter-spacing:-.01em;">A &euro;10 gift card, and a card we wrote by hand.</div>
+        <div style="margin-top:9px;font-size:13.5px;line-height:1.65;color:#b9bbbd;">
+          The gift card has no expiry and works on anything, including sets. Keep it or
+          pass it to someone &mdash; it isn&rsquo;t tied to your name.
+        </div>
+      </td></tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:30px 40px 0;">
+    <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8a8a8a;font-weight:600;">Making it last</div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:14px;">
+      <tr><td style="padding-bottom:13px;">
+        <div style="font-size:13.5px;font-weight:600;color:#2c2d2e;">Spray onto skin, not clothes</div>
+        <div style="margin-top:4px;font-size:13px;line-height:1.6;color:#7c7c7c;">Warm skin at the pulse points &mdash; wrists, neck, inner elbow &mdash; carries a fragrance for hours longer than fabric does.</div>
+      </td></tr>
+      <tr><td style="padding-bottom:13px;">
+        <div style="font-size:13.5px;font-weight:600;color:#2c2d2e;">Don&rsquo;t rub it in</div>
+        <div style="margin-top:4px;font-size:13px;line-height:1.6;color:#7c7c7c;">Rubbing breaks the top notes. Spray and let it settle on its own.</div>
+      </td></tr>
+      <tr><td>
+        <div style="font-size:13.5px;font-weight:600;color:#2c2d2e;">Keep it out of the bathroom</div>
+        <div style="margin-top:4px;font-size:13px;line-height:1.6;color:#7c7c7c;">Heat and steam are what actually turn a fragrance. A drawer or a cupboard keeps it true for years.</div>
+      </td></tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:28px 40px 0;" align="center">
+    <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+      <td style="background:#2c2d2e;border-radius:25px;">
+        <a href="{{ order_status_url }}" style="display:inline-block;padding:15px 40px;font-size:14.5px;font-weight:600;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Tell us what you think</a>
+      </td>
+    </tr></table>
+    <div style="margin-top:13px;font-size:13px;color:#8a8a8a;">Two minutes, and it genuinely shapes what we make next.</div>
+  </td></tr>
+
+  <tr><td style="padding:32px 40px 0;">
+    <div style="height:1px;background:#ebe6e3;font-size:0;">&nbsp;</div>
+    <div style="margin-top:24px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8a8a8a;font-weight:600;">If something&rsquo;s wrong</div>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;">
+      <tr><td style="padding-bottom:15px;">
+        <div style="font-size:13.5px;font-weight:600;color:#2c2d2e;">This says delivered, but I have nothing.</div>
+        <div style="margin-top:4px;font-size:13px;line-height:1.6;color:#7c7c7c;">Check with anyone else at the address, then reply to this email. We open a carrier investigation the same working day, and you get a replacement or a refund regardless of how it ends.</div>
+      </td></tr>
+      <tr><td style="padding-bottom:15px;">
+        <div style="font-size:13.5px;font-weight:600;color:#2c2d2e;">Something arrived damaged or leaking.</div>
+        <div style="margin-top:4px;font-size:13px;line-height:1.6;color:#7c7c7c;">Send us a photo in a reply. We ship a replacement immediately and you keep or bin the damaged one &mdash; no return needed.</div>
+      </td></tr>
+      <tr><td style="padding-bottom:15px;">
+        <div style="font-size:13.5px;font-weight:600;color:#2c2d2e;">I don&rsquo;t like the scent.</div>
+        <div style="margin-top:4px;font-size:13px;line-height:1.6;color:#7c7c7c;">Return it within 30 days, opened or not, and we&rsquo;ll refund you. Fragrance is personal and we&rsquo;d rather you had the right one.</div>
+      </td></tr>
+      <tr><td>
+        <div style="font-size:13.5px;font-weight:600;color:#2c2d2e;">How do I start a return?</div>
+        <div style="margin-top:4px;font-size:13px;line-height:1.6;color:#7c7c7c;">Reply with your order number and we send a prepaid label the same working day.</div>
+      </td></tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:26px 40px 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#faf7f5;border-radius:12px;">
+      <tr><td style="padding:22px 24px;">
+        <div style="font-size:15px;font-weight:600;color:#2c2d2e;">We&rsquo;re here for 30 days &mdash; and after.</div>
+        <div style="margin-top:7px;font-size:13.5px;line-height:1.65;color:#7c7c7c;">
+          Reply to this email or write to <a href="mailto:info@petitemort.co" style="color:#b8543d;text-decoration:underline;">info@petitemort.co</a>.
+          We answer within one working day, Monday to Friday.
+        </div>
+      </td></tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:30px 40px 38px;" align="center">
+    <div style="font-size:12.5px;line-height:1.7;color:#9a9a9a;">
+      <a href="{{ shop.url }}/policies/shipping-policy" style="color:#7c7c7c;text-decoration:none;">Shipping</a> &nbsp;·&nbsp;
+      <a href="{{ shop.url }}/policies/refund-policy" style="color:#7c7c7c;text-decoration:none;">Returns</a> &nbsp;·&nbsp;
+      <a href="{{ shop.url }}/pages/contact" style="color:#7c7c7c;text-decoration:none;">Contact</a> &nbsp;·&nbsp;
+      <a href="{{ shop.url }}" style="color:#7c7c7c;text-decoration:none;">Shop</a>
+    </div>
+    <div style="margin-top:16px;font-size:11.5px;line-height:1.7;color:#b4b4b4;">
+      {{ shop_name }} &nbsp;·&nbsp; Instraat 13, 6021 AC Budel, Netherlands<br>
+      This is a delivery confirmation for order {{ order_name }}.
+    </div>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>
