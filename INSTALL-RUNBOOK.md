@@ -62,8 +62,8 @@ and the two highest-volume emails go last when you already trust the process.
 
 | Order | File | Shopify template (Settings → Notifications) |
 |---|---|---|
-| 1 | `refund/shopify.liquid` | Refund notification |
-| 2 | `order-cancelled/shopify.liquid` | Order cancelled |
+| 1 | `refund/shopify.liquid` | **Order refund** |
+| 2 | `order-cancelled/shopify.liquid` | **Order canceled** (Shopify uses the US spelling) |
 | 3 | `out-for-delivery/shopify.liquid` | Out for delivery |
 | 4 | `delivered/shopify.liquid` | Delivered |
 | 5 | `shipping-update/shopify.liquid` | Shipping update |
@@ -124,17 +124,42 @@ Liquid rather than ship markup that renders blank:
 | "Reason: sorting-centre delay in Malmö" | Shipping update | Carrier delay reasons aren't exposed | Same, or carrier API |
 | "Signed for by S. Kilpimaa" | Delivered | No signatory field | Carrier API only |
 
-The Delivered email uses `fulfillment.updated_at` as the delivery time — the closest real
-proxy. It is usually right and occasionally reflects a later status write instead.
+### Checked against Shopify's documentation
 
-**Verify in Shopify's own preview**, because this was render-tested against python-liquid,
-not Shopify's engine — that catches syntax and logic faults, not variable-name faults:
+After the first build I went through the notification variable reference and the Liquid
+object docs. Results:
 
-- `cancel_reason_label` on Order cancelled
-- `refund_line_items` and `line.subtotal` on Refund notification
-- `amount` on Refund notification (should be this refund, not the order total)
-- `fulfillment.tracking_url` falling back to `order_status_url` when absent
-- The date arithmetic (`| date: '%s' | plus: … | date: …`) rendering real dates, not numbers
+✅ **Confirmed to exist:** `order_name`, `order_number`, `created_at`, `line_items`,
+`subtotal_price`, `total_price`, `shipping_price`, `tax_price`, `transactions`,
+`order_status_url`, `requires_shipping`, `item_count`, `cancel_reason`, `cancelled_at`,
+`discount_applications`, `refund_line_items`, `amount`, `shop.name`,
+`fulfillment.created_at`, `fulfillment.tracking_company`, `fulfillment.tracking_number`,
+`fulfillment.tracking_url`, `fulfillment.item_count`, `fulfillment.fulfillment_line_items`.
+The `date` filter accepts `'now'`, and takes Ruby strftime, so `%-d` and `%w` are fine.
+The `| date: '%s' | plus: seconds | date: …` arithmetic is the established Shopify pattern
+for exactly this job.
+
+🔴 **One real bug found and fixed: `fulfillment.updated_at` does not exist.** The Delivered
+email was using it for the delivery time, falling back to fulfilment creation — so it would
+have printed the **despatch** time to the customer as if it were the delivery time. Both
+Delivered and Shipping update now use `'now'`, which is documented and is genuinely the
+right anchor: each email is sent at the moment its event happens.
+
+Also corrected: `shop_name` → `shop.name`; refund line `subtotal` now falls back to the
+line price.
+
+🟠 **Still unverified — check these in Shopify's Preview before trusting them.** Each is
+guarded so a missing value renders nothing rather than breaking, but a blank where a value
+should be is still wrong:
+
+- `shop.url` — used for the footer policy links
+- `cancel_reason_label` — falls back to `cancel_reason`
+- `transaction.gateway_display_name` — falls back to `transaction.gateway`
+- `transaction.payment_details.credit_card_company` / `_last_four_digits`
+- `discount_applications[].total_allocated_amount`
+- `line.selling_plan_allocation` on Order confirmation
+- `refund_line_items[].subtotal`
+- `amount` reflecting *this* refund rather than the order total
 
 ---
 
@@ -193,8 +218,13 @@ Draft orders in the admin exercise the real templates without touching a custome
 | Images blocked | Disable images in the client | Progress rail still readable |
 | Dark mode | iOS Mail dark | Panels legible, no black-on-black |
 
-All eight data cases above are already covered in the offline render harness and pass.
-Dark mode and image-blocking need a real client.
+All eight data cases above are covered in the offline render harness — 13 permutations,
+including a missing `fulfillment.created_at` and a refund line with no `subtotal` — and all
+pass. Dark mode and image-blocking need a real client.
+
+Remember what the harness is: python-liquid, not Shopify's engine. It proves the syntax,
+the conditional branches and the date arithmetic. It cannot prove a variable name, which is
+why §5 exists and why every template gets a Preview and a test send.
 
 ---
 

@@ -2,20 +2,23 @@
   Petite Mort — DELIVERED
   Direction A (Warm Editorial). Settings → Notifications → Delivered.
 
-  DELIBERATE OMISSION vs the design preview: Shopify exposes no signatory name and no
-  carrier delivery timestamp in this scope. fulfillment.updated_at is the closest real
-  proxy for "when" and is used below; "signed for by …" is dropped, not faked.
+  DELIBERATE OMISSION vs the design preview: Shopify exposes no signatory name, so
+  "signed for by …" is dropped rather than faked. The delivery time comes from 'now'
+  (see the note below), not from a fulfillment timestamp.
 {%- endcomment -%}
 
 {%- assign buyer = customer.first_name | default: shipping_address.first_name -%}
-{%- assign delivered_ts = fulfillment.updated_at | default: fulfillment.created_at -%}
+{%- comment -%} fulfillment.updated_at does NOT exist in Liquid. This email is sent at
+  the delivery scan, so 'now' IS the delivery moment -- and 'now' is documented. Do not
+  swap this for a fulfillment timestamp; that prints the despatch time as delivery. {%- endcomment -%}
+{%- assign delivered_ts = 'now' -%}
 
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{{ shop_name }} — Order {{ order_name }} delivered</title>
+<title>{{ shop.name }} — Order {{ order_name }} delivered</title>
 </head>
 <body style="margin:0;padding:0;background:#efeae6;">
 
@@ -27,7 +30,7 @@
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:100%;background:#ffffff;border-radius:16px;overflow:hidden;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
 
   <tr><td style="padding:34px 40px 0;" align="center">
-    <img src="https://petitemort.co/cdn/shop/files/PM_Logo1_Black_1.png" width="132" alt="{{ shop_name }}" style="display:block;border:0;width:132px;height:auto;">
+    <img src="https://petitemort.co/cdn/shop/files/PM_Logo1_Black_1.png" width="132" alt="{{ shop.name }}" style="display:block;border:0;width:132px;height:auto;">
   </td></tr>
 
   <tr><td style="padding:26px 40px 0;">
@@ -163,7 +166,7 @@
       <a href="{{ shop.url }}" style="color:#7c7c7c;text-decoration:none;">Shop</a>
     </div>
     <div style="margin-top:16px;font-size:11.5px;line-height:1.7;color:#b4b4b4;">
-      {{ shop_name }} &nbsp;·&nbsp; Instraat 13, 6021 AC Budel, Netherlands<br>
+      {{ shop.name }} &nbsp;·&nbsp; Instraat 13, 6021 AC Budel, Netherlands<br>
       This is a delivery confirmation for order {{ order_name }}.
     </div>
   </td></tr>

@@ -21,8 +21,8 @@ for review. Or open any file below directly.
 | Shipping update | [preview](shipping-update/direction-a-warm-editorial.html) | [liquid](shipping-update/shopify.liquid) | Shipping update |
 | Out for delivery | [preview](out-for-delivery/direction-a-warm-editorial.html) | [liquid](out-for-delivery/shopify.liquid) | Out for delivery |
 | Delivered | [preview](delivered/direction-a-warm-editorial.html) | [liquid](delivered/shopify.liquid) | Delivered |
-| Order cancelled | [preview](order-cancelled/direction-a-warm-editorial.html) | [liquid](order-cancelled/shopify.liquid) | Order cancelled |
-| Refund notification | [preview](refund/direction-a-warm-editorial.html) | [liquid](refund/shopify.liquid) | Refund notification |
+| Order cancelled | [preview](order-cancelled/direction-a-warm-editorial.html) | [liquid](order-cancelled/shopify.liquid) | Order canceled |
+| Refund notification | [preview](refund/direction-a-warm-editorial.html) | [liquid](refund/shopify.liquid) | Order refund |
 
 Previews carry sample data and are the design artefact. The `.liquid` files are what goes
 into Shopify.
@@ -80,8 +80,11 @@ shipment, unpaid cancellation, partial refund, no-discount, and paid shipping â€
 computed dates checked by hand. All pass.
 
 That harness is python-liquid, not Shopify's engine: it catches syntax, logic and
-filter-chain faults, not variable-name faults. The variables to confirm in Shopify's own
-preview are listed in the runbook.
+filter-chain faults, not variable-name faults. Every variable was then checked against
+Shopify's notification-variable reference and Liquid object docs â€” which turned up one real
+bug (`fulfillment.updated_at` does not exist, and the Delivered email was using it for the
+delivery time) plus two wrong names. All fixed. The handful still unconfirmed are listed in
+the runbook, and each is guarded so a miss renders nothing rather than breaking.
 
 ---
 
