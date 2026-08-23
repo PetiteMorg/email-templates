@@ -68,7 +68,11 @@ Beyond the standard order summary:
   Expander app).
 - **The thank-you card and €10 gift card named explicitly**, so the customer expects them
   before opening the box.
-- **VAT shown separately** — required across the EU.
+- **No separate VAT line.** VAT is deliberately disabled customer-facing on this store
+  (confirmed by Amed 21 Aug — it is priced in and settled in the accounting back end), and
+  Shopify's tax regions collect 0% everywhere. The order confirmation still carries a
+  `{% if tax_price > 0 %}` guarded VAT row, so it renders nothing today and appears
+  automatically if a tax registration is ever added. Nothing to change to install.
 - **A support block with a stated response time**, and on the money emails an explicit
   "come to us before your bank" — a chargeback costs six to eight weeks and a fee to reach
   the answer we'd give the same day.
