@@ -1,0 +1,268 @@
+<title>Post-purchase Email Set</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Karla:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --paper:#f7f3f0;
+    --surface:#ffffff;
+    --ink:#2c2d2e;
+    --ink70:#57585a;
+    --ink45:#8a8a8a;
+    --terra:#b8543d;
+    --blush:#f3d6cd;
+    --shell:#efeae6;
+    --hair:#e6e0dc;
+    --ok:#3f6d52;
+    --ok-soft:#e3ede7;
+    --hold:#87673a;
+    --hold-soft:#f4ebda;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#191715;
+      --surface:#221f1d;
+      --ink:#f0eae5;
+      --ink70:#bfb6af;
+      --ink45:#8e857e;
+      --terra:#e2917a;
+      --blush:#442d27;
+      --shell:#2a2724;
+      --hair:#332e2b;
+      --ok:#82bd9b;
+      --ok-soft:#1d2e25;
+      --hold:#dcbb7c;
+      --hold-soft:#32281a;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#191715;
+    --surface:#221f1d;
+    --ink:#f0eae5;
+    --ink70:#bfb6af;
+    --ink45:#8e857e;
+    --terra:#e2917a;
+    --blush:#442d27;
+    --shell:#2a2724;
+    --hair:#332e2b;
+    --ok:#82bd9b;
+    --ok-soft:#1d2e25;
+    --hold:#dcbb7c;
+    --hold-soft:#32281a;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Karla",system-ui,-apple-system,sans-serif;
+    font-size:16px;line-height:1.6;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:44px 24px 88px}
+  @media (max-width:640px){ .wrap{padding:28px 14px 56px} }
+
+  .eyebrow{
+    font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--terra);
+  }
+  h1{
+    font-family:"Instrument Serif",Georgia,serif;font-weight:400;
+    font-size:clamp(36px,6vw,58px);line-height:1.04;letter-spacing:-.01em;
+    margin:12px 0 0;text-wrap:balance;
+  }
+  .stand{color:var(--ink70);margin:14px 0 0;max-width:56ch;font-size:17px}
+
+  /* status band */
+  .band{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+    background:var(--hair);border:1px solid var(--hair);margin:30px 0 8px;
+  }
+  @media (max-width:620px){ .band{grid-template-columns:1fr} }
+  .cell{background:var(--surface);padding:16px 18px}
+  .cell .n{
+    font-family:"Instrument Serif",Georgia,serif;font-size:34px;line-height:1;
+    font-variant-numeric:tabular-nums;
+  }
+  .cell .n.small{font-size:20px;line-height:1.5}
+  .cell .k{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink45);margin-top:8px}
+
+  .notes{margin:26px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+  .notes li{
+    padding-left:16px;position:relative;color:var(--ink70);font-size:15px;max-width:64ch;
+  }
+  .notes li::before{
+    content:"";position:absolute;left:0;top:.62em;width:6px;height:6px;border-radius:50%;
+    background:var(--terra);
+  }
+  .notes b{color:var(--ink);font-weight:600}
+
+  .rule{
+    display:flex;align-items:center;gap:16px;margin:52px 0 26px;
+  }
+  .rule span{
+    font-family:"Instrument Serif",Georgia,serif;font-style:italic;font-size:24px;
+    color:var(--ink70);white-space:nowrap;
+  }
+  .rule::after{content:"";flex:1;height:1px;background:var(--hair)}
+
+  /* email panels */
+  .mail{margin-top:34px}
+  .mh{
+    display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+    padding-bottom:12px;border-bottom:1px solid var(--hair);flex-wrap:wrap;
+  }
+  .mh-t{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .mh h2{
+    font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:26px;
+    letter-spacing:-.005em;margin:0;
+  }
+  .trigger{margin:0;color:var(--ink45);font-size:14px}
+  .chip{
+    font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+    padding:4px 9px;border-radius:2px;white-space:nowrap;
+  }
+  .chip.code{background:var(--ok-soft);color:var(--ok)}
+  .chip.qls{background:var(--hold-soft);color:var(--hold)}
+
+  .stage{
+    margin-top:16px;background:var(--shell);padding:18px;overflow-x:auto;
+    border:1px solid var(--hair);
+  }
+  @media (max-width:640px){ .stage{padding:8px} }
+  /* The script below sets an exact height per email. If the sandbox denies access to
+     the frame's document, this fallback has to be tall enough to read rather than a
+     stub: the frame keeps its own scrollbar either way. */
+  iframe.pv{
+    display:block;width:600px;max-width:100%;min-height:900px;height:900px;
+    border:1px solid var(--hair);background:#ffffff;
+  }
+
+  footer{
+    margin-top:64px;padding-top:20px;border-top:1px solid var(--hair);
+    color:var(--ink45);font-size:14px;
+  }
+  footer a{color:var(--terra)}
+</style>
+
+<div class="wrap">
+
+  <div class="eyebrow">Petite Mort</div>
+  <h1>Post-purchase Email Set</h1>
+  <p class="stand">The seven emails a customer receives after they order, rendered exactly as they will arrive, straight from the template files in this repository. Sample order data throughout.</p>
+
+  <div class="band">
+    <div class="cell">
+      <div class="n">3</div>
+      <div class="k">Built into the store</div>
+    </div>
+    <div class="cell">
+      <div class="n">4</div>
+      <div class="k">Sent by QLS</div>
+    </div>
+    <div class="cell">
+      <div class="n small">Not sending yet</div>
+      <div class="k">Safety switch is off</div>
+    </div>
+  </div>
+
+  <ul class="notes">
+    <li><b>Nothing reaches a customer today.</b> The three store emails are in the code and on production, but the send switch defaults to off. It stays off until a test lands in our own inbox first.</li>
+    <li><b>The four delivery emails are QLS's job,</b> not the store's. They are shown here because the customer receives them as one set and the voice has to match.</li>
+    <li><b>The logo address was corrected on 10 September.</b> All seven pointed at the old Shopify CDN, which stopped serving images when that store closed, so the logo was arriving broken. They now point at cdn.petitemort.co.</li>
+    <li>Names, order numbers, amounts and tracking numbers are examples, not real orders.</li>
+  </ul>
+
+  <div class="rule"><span>The normal journey</span></div>
+      <section class="mail">
+        <header class="mh">
+          <div class="mh-t"><h2>Order confirmation</h2><p class="trigger">The moment they pay</p></div>
+          <span class="chip code">Wired in code</span>
+        </header>
+        <div class="stage">
+          <iframe class="pv" title="Order confirmation email preview" src="order-confirmation/direction-a-warm-editorial.html"></iframe>
+        </div>
+      </section>
+      <section class="mail">
+        <header class="mh">
+          <div class="mh-t"><h2>Shipping confirmation</h2><p class="trigger">Parcel leaves the warehouse</p></div>
+          <span class="chip qls">QLS sends this</span>
+        </header>
+        <div class="stage">
+          <iframe class="pv" title="Shipping confirmation email preview" src="shipping-confirmation/direction-a-warm-editorial.html"></iframe>
+        </div>
+      </section>
+      <section class="mail">
+        <header class="mh">
+          <div class="mh-t"><h2>Shipping update</h2><p class="trigger">Carrier revises the window</p></div>
+          <span class="chip qls">QLS sends this</span>
+        </header>
+        <div class="stage">
+          <iframe class="pv" title="Shipping update email preview" src="shipping-update/direction-a-warm-editorial.html"></iframe>
+        </div>
+      </section>
+      <section class="mail">
+        <header class="mh">
+          <div class="mh-t"><h2>Out for delivery</h2><p class="trigger">On the courier's van</p></div>
+          <span class="chip qls">QLS sends this</span>
+        </header>
+        <div class="stage">
+          <iframe class="pv" title="Out for delivery email preview" src="out-for-delivery/direction-a-warm-editorial.html"></iframe>
+        </div>
+      </section>
+      <section class="mail">
+        <header class="mh">
+          <div class="mh-t"><h2>Delivered</h2><p class="trigger">Handed over</p></div>
+          <span class="chip qls">QLS sends this</span>
+        </header>
+        <div class="stage">
+          <iframe class="pv" title="Delivered email preview" src="delivered/direction-a-warm-editorial.html"></iframe>
+        </div>
+      </section>
+
+
+  <div class="rule"><span>If something goes wrong</span></div>
+      <section class="mail">
+        <header class="mh">
+          <div class="mh-t"><h2>Order cancelled</h2><p class="trigger">Order cancelled before shipping</p></div>
+          <span class="chip code">Wired in code</span>
+        </header>
+        <div class="stage">
+          <iframe class="pv" title="Order cancelled email preview" src="order-cancelled/direction-a-warm-editorial.html"></iframe>
+        </div>
+      </section>
+      <section class="mail">
+        <header class="mh">
+          <div class="mh-t"><h2>Refund confirmation</h2><p class="trigger">A refund is released</p></div>
+          <span class="chip code">Wired in code</span>
+        </header>
+        <div class="stage">
+          <iframe class="pv" title="Refund confirmation email preview" src="refund/direction-a-warm-editorial.html"></iframe>
+        </div>
+      </section>
+
+
+  <footer>
+    Direction A, warm editorial. Source in <a href="https://github.com/PetiteMorg/email-templates">PetiteMorg/email-templates</a>. Order confirmation, cancellation and refund are wired to the store's own events; shipping, delivery updates and the delivered notice come from QLS.
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var frames = document.querySelectorAll("iframe.pv")
+    function fit(f) {
+      try {
+        var d = f.contentDocument
+        if (!d || !d.documentElement) return
+        var h = Math.max(d.documentElement.scrollHeight, d.body ? d.body.scrollHeight : 0)
+        if (h > 0) f.style.height = (h + 2) + "px"
+      } catch (e) { /* leave the fallback height */ }
+    }
+    frames.forEach(function (f) {
+      f.addEventListener("load", function () { fit(f) })
+      fit(f)
+    })
+    var t
+    window.addEventListener("resize", function () {
+      clearTimeout(t)
+      t = setTimeout(function () { frames.forEach(fit) }, 150)
+    })
+  })()
+</script>
