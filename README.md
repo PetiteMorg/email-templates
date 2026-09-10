@@ -1,31 +1,103 @@
 # Petite Mort — Transactional Email Templates
 
-The post-purchase notification set sent from Shopify, in the approved Direction A
-(Warm Editorial) language.
+The post-purchase notification set, in the approved Direction A (Warm Editorial) language.
 
-**Nothing here is live.** No Shopify template has been changed. Shopify has no draft
-state for transactional notifications, so this repo *is* the draft — read
-[`INSTALL-RUNBOOK.md`](INSTALL-RUNBOOK.md) before pasting anything.
+**This repository no longer describes a Shopify project.** It did until September 2026, and the
+Shopify framing is what made this set hard to follow. The Shopify store is gone. Three of these
+seven emails are now rendered and sent by our own Medusa store; the other four are the parcel
+lifecycle. The `.liquid` files can no longer run anywhere.
+
+To review the set, open **[`preview.html`](preview.html)**, which renders all seven inline. That
+is the link to share. [`index.html`](index.html) is the older card gallery and still works.
 
 ---
 
-## How to view
+## Who sends what
 
-Open [`index.html`](index.html) for the whole set as a gallery — that's the link to share
-for review. Or open any file below directly.
+| Email | Sent by | State |
+|---|---|---|
+| Order confirmation | **The Medusa store** | Code is on `main`. Not sending, see below. |
+| Order cancelled | **The Medusa store** | Same. |
+| Refund notification | **The Medusa store** | Same. |
+| Shipping confirmation | QLS | **Not verified.** See the open question below. |
+| Shipping update | QLS | Not verified. |
+| Out for delivery | QLS | Not verified. |
+| Delivered | QLS | Not verified. |
 
-| Email | Preview | Production Liquid | Shopify template |
-|---|---|---|---|
-| Order confirmation | [preview](order-confirmation/direction-a-warm-editorial.html) | [liquid](order-confirmation/shopify.liquid) | Order confirmation |
-| Shipping confirmation | [preview](shipping-confirmation/direction-a-warm-editorial.html) | [liquid](shipping-confirmation/shopify.liquid) | Shipping confirmation |
-| Shipping update | [preview](shipping-update/direction-a-warm-editorial.html) | [liquid](shipping-update/shopify.liquid) | Shipping update |
-| Out for delivery | [preview](out-for-delivery/direction-a-warm-editorial.html) | [liquid](out-for-delivery/shopify.liquid) | Out for delivery |
-| Delivered | [preview](delivered/direction-a-warm-editorial.html) | [liquid](delivered/shopify.liquid) | Delivered |
-| Order cancelled | [preview](order-cancelled/direction-a-warm-editorial.html) | [liquid](order-cancelled/shopify.liquid) | Order canceled |
-| Refund notification | [preview](refund/direction-a-warm-editorial.html) | [liquid](refund/shopify.liquid) | Order refund |
+The three the store sends are wired to its own events:
 
-Previews carry sample data and are the design artefact. The `.liquid` files are what goes
-into Shopify.
+```
+order.placed      ->  src/subscribers/order-confirmation-email.ts
+order.canceled    ->  src/subscribers/order-cancelled-email.ts
+payment.refunded  ->  src/subscribers/order-refund-email.ts
+```
+
+in `PetiteMorg/pm-medusa-store`, rendering through `src/lib/order-emails/`.
+
+### The open question, and it is not small
+
+**Nothing in the store's code or documentation says QLS emails the customer.** The only record of
+that arrangement is a line in Notion. If QLS is not actually configured to send them, then nobody
+sends shipping, delivery or out-for-delivery notifications at all, and the customer hears nothing
+between paying and the parcel arriving. That needs confirming in the QLS dashboard, not assumed
+from this table.
+
+---
+
+## Can these send today? No.
+
+Read from the store's own admin on 10 September 2026, Settings → Notifications:
+
+```
+Provider   none beyond local
+Sender     info@petitemort.co
+```
+
+> Only the local provider is registered, which logs instead of sending.
+
+Two separate things both have to change before a customer receives anything:
+
+1. **A provider has to exist.** `RESEND_API_KEY` is not set in production, so the local provider
+   is the only one registered and it writes to the log. Resend is the chosen provider, not
+   Klaviyo, because these are transactional: a receipt has to arrive whether or not someone
+   accepted marketing, and Klaviyo would want the copy to live in Klaviyo.
+   **`RESEND_API_KEY` and `REVIEW_EMAIL_FROM` must be set together** or the notification module
+   throws at boot and the whole backend fails to start.
+2. **The safety switch has to be turned up.** `ORDER_EMAIL_MODE` defaults to `off`, which renders
+   and logs but transmits nothing. `allowlist` sends only to named addresses; `live` sends to
+   customers. It already stopped a real customer address on the first test, which is the reason
+   it exists.
+
+---
+
+## Where the design actually lives now
+
+The seven `direction-a-warm-editorial.html` files are the design source and the thing to review.
+They carry sample data.
+
+For the three the store sends, the design is re-implemented in code in
+`src/lib/order-emails/design.ts` and `render.ts`, because an email has to be built from a live
+order rather than filled into a static file. **The two were compared on 10 September 2026 and
+match**: the same twelve colours and the identical font stack
+(`Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif`).
+
+Nothing enforces that. `design.ts` names this repository as its source of truth but does not read
+from it, so the two can drift with no test failing. If a change is made here, it has to be made
+there in the same breath.
+
+## Archive, kept for reference, cannot run
+
+- **The seven `shopify.liquid` files.** These were the production templates when the store was on
+  Shopify. Medusa does not read Shopify Liquid, and the Shopify store no longer exists. They are
+  kept because they hold the approved copy and the guarded edge cases, which is worth having when
+  the code version is extended. They are not a deployment target.
+- **[`INSTALL-RUNBOOK.md`](INSTALL-RUNBOOK.md)** is the instructions for pasting those templates
+  into the Shopify admin. There is no Shopify admin. Read it as history.
+
+The logo address in all fourteen files was corrected on 10 September 2026. Every one of them
+pointed at `petitemort.co/cdn/shop/files/...`, which stopped serving images when the Shopify store
+closed and now answers with the maintenance page as HTML, so the logo was arriving blank. They
+now use `cdn.petitemort.co`.
 
 ---
 
@@ -42,15 +114,11 @@ Pulled from the live theme, not invented. Full token list in
 | Hairline | `#e5e5e5` | `--color-border` |
 | Paper | `#ffffff` | `--bg-body` |
 
-Buttons use a 25px radius and cards 16px, matching `--button-border-radius` and
-`--block-border-radius`. Typeface is Inter, as on the site.
+Buttons use a 25px radius and cards 16px. Typeface is Inter, as on the site.
 
-The theme's default accent `#3F72E5` is deliberately unused — it ships with the theme and
-carries no brand meaning.
-
-Negative states — cancellation, refund — swap the blush panel for a muted `#f6f2f0` with a
-grey rule, keeping terracotta only on the money. Bad news in a warm celebratory tint reads
-as tone-deaf.
+Negative states, cancellation and refund, swap the blush panel for a muted `#f6f2f0` with a grey
+rule, keeping terracotta only on the money. Bad news in a warm celebratory tint reads as
+tone-deaf.
 
 ---
 
@@ -58,49 +126,44 @@ as tone-deaf.
 
 Beyond the standard order summary:
 
-- **A delivery estimate**, computed per market from our own lead times, because the store
-  has no carrier accounts and Shopify's estimated delivery dates are off. Weekend
-  endpoints are pushed to the Monday — no market here delivers at weekends.
-- **A progress strip** — Confirmed → Packed → Shipped → Delivered, advancing with the
-  email, built from table cells so it survives image blocking.
-- **FAQs chosen to remove the tickets we actually get**, including why an order shows more
-  line items than were bought (sets are expanded into individual bottles by the Bundle
-  Expander app).
-- **The thank-you card and €10 gift card named explicitly**, so the customer expects them
-  before opening the box.
-- **No separate VAT line.** VAT is deliberately disabled customer-facing on this store
-  (confirmed by Amed 21 Aug — it is priced in and settled in the accounting back end), and
-  Shopify's tax regions collect 0% everywhere. The order confirmation still carries a
-  `{% if tax_price > 0 %}` guarded VAT row, so it renders nothing today and appears
-  automatically if a tax registration is ever added. Nothing to change to install.
-- **A support block with a stated response time**, and on the money emails an explicit
-  "come to us before your bank" — a chargeback costs six to eight weeks and a fee to reach
-  the answer we'd give the same day.
+- **A delivery estimate**, computed per market from our own lead times, because the store has no
+  carrier accounts. Weekend endpoints are pushed to the Monday, since no market here delivers at
+  weekends.
+- **A progress strip**, Confirmed → Packed → Shipped → Delivered, advancing with the email and
+  built from table cells so it survives image blocking.
+- **FAQs chosen to remove the tickets we actually get**, including why an order shows more line
+  items than were bought, since sets are expanded into individual bottles.
+- **The thank-you card and €10 gift card named explicitly**, so the customer expects them before
+  opening the box.
+- **No separate VAT line.** VAT is disabled customer-facing on this store, confirmed by Amed on
+  21 August: it is priced in and settled in the accounting back end. The Liquid version guards
+  the VAT row behind `{% if tax_price > 0 %}` so it appears automatically if a registration is
+  ever added. The code version reads the order's own tax total; whether it behaves the same way
+  at zero has not been checked against a real order.
 
-## Verification
+## Verification, and what it was verification of
 
-Every Liquid template was rendered offline across 11 data permutations — including partial
-shipment, unpaid cancellation, partial refund, no-discount, and paid shipping — with all
-computed dates checked by hand. All pass.
+Every Liquid template was rendered offline across 11 data permutations, including partial
+shipment, unpaid cancellation, partial refund, no-discount and paid shipping, with all computed
+dates checked by hand. All passed, and the pass caught a real bug:
+`fulfillment.updated_at` does not exist, and the Delivered email had been using it for the
+delivery time.
 
-That harness is python-liquid, not Shopify's engine: it catches syntax, logic and
-filter-chain faults, not variable-name faults. Every variable was then checked against
-Shopify's notification-variable reference and Liquid object docs — which turned up one real
-bug (`fulfillment.updated_at` does not exist, and the Delivered email was using it for the
-delivery time) plus two wrong names. All fixed. The handful still unconfirmed are listed in
-the runbook, and each is guarded so a miss renders nothing rather than breaking.
+That work tested **the Liquid files**, which no longer run. It is not evidence about the code
+version that now sends. The code version has been rendered against real orders through
+`src/scripts/preview-order-email.ts` and looked at, which is a weaker guarantee than 11
+permutations and worth strengthening.
 
 ---
 
-## Planned
+## Open
 
-- Copy adaptation into Dutch first, then SV, DA, FI — **blocked on an open question about
-  whether these templates have per-language versions in the admin**, which changes the
-  size of the job by about 6×. See runbook §6.
-- A holiday table per market, so windows spanning Easter or Christmas stop reading
-  optimistically. Before Q4.
-- Shopify Flow writing an order metafield, if we want the "previously arriving…" line on
-  the shipping update to be real rather than dropped.
-
-Design first, then copy, then adaptation — adapting before the design is settled throws
-the adaptation away.
+- **Confirm QLS actually emails the customer** for the four parcel emails. Everything else here is
+  moot if it does not.
+- **Set `RESEND_API_KEY` and `REVIEW_EMAIL_FROM`** in production, together, then verify the
+  backend still boots.
+- **Send one real test** with `ORDER_EMAIL_MODE=allowlist` before going anywhere near `live`.
+- **Dutch copy** for the three the store sends. The per-language question that blocked this on
+  Shopify does not apply any more: the code carries EN and NL side by side in
+  `src/lib/order-emails/copy.ts`.
+- **A drift test** so this repository and `design.ts` cannot disagree silently.
