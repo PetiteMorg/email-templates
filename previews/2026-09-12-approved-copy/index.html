@@ -5,12 +5,17 @@ body{margin:0;font:15px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetic
 header{padding:22px 28px 14px;background:#fff;border-bottom:1px solid #ebe6e3}
 h1{margin:0 0 6px;font-size:20px} p{margin:4px 0;color:#57585a}
 .bar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:12px 28px;background:#faf7f5;border-bottom:1px solid #ebe6e3}
-select,button{font:inherit;padding:7px 10px;border:1px solid #d8d2ce;border-radius:8px;background:#fff}
+select,button{font:inherit;padding:7px 10px;border:1px solid #d8d2ce;border-radius:8px;background:#fff;cursor:pointer}
 button.on{background:#2c2d2e;color:#fff;border-color:#2c2d2e}
-.panes{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:18px 28px}
+.note{color:#8a8a8a;font-size:13px}
+.panes{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:18px 28px;align-items:start}
 .pane h2{margin:0 0 8px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#8a8a8a}
-iframe{width:100%;height:1400px;border:1px solid #ebe6e3;border-radius:12px;background:#efeae6}
-.panes.mobile iframe{width:375px;justify-self:start}
+/* The email is a fixed 600px card with 16px of ground either side: 632px. Mail apps on a phone do
+   not reflow it, they zoom the whole document out until it fits the screen. The frame does the
+   same: the iframe always lays the email out at 632px and is scaled to the width on offer. */
+.frame{overflow:hidden;border:1px solid #ebe6e3;border-radius:12px;background:#efeae6;position:relative}
+.frame iframe{width:632px;height:1600px;border:0;transform-origin:0 0;display:block}
+.panes.mobile .frame{border-radius:28px;border:8px solid #2c2d2e;box-shadow:0 12px 32px rgba(0,0,0,.18)}
 table{border-collapse:collapse;margin:8px 28px 40px;background:#fff;border-radius:12px;overflow:hidden}
 td,th{padding:8px 14px;border-bottom:1px solid #ebe6e3;text-align:left;vertical-align:top} code{font-size:13px}
 @media (max-width:900px){.panes{grid-template-columns:1fr}}
@@ -25,11 +30,12 @@ td,th{padding:8px 14px;border-bottom:1px solid #ebe6e3;text-align:left;vertical-
 <option value="cancelled-en">Cancellation · EN</option>
 <option value="confirmation-discovery-nl">Order confirmation, discovery set bought · NL</option>
 <option value="confirmation-discovery-en">Order confirmation, discovery set bought · EN</option></select></label>
-<button id="w" class="on" data-w="desktop">Desktop</button><button data-w="mobile">Mobile 375px</button>
-<span id="subj" style="color:#57585a"></span></div>
+<button class="on" data-w="desktop">Desktop</button><button data-w="mobile">Phone 375px</button>
+<span id="subj" style="color:#57585a"></span>
+<span class="note" id="note"></span></div>
 <div class="panes" id="panes">
-<div class="pane"><h2>Before</h2><iframe id="b"></iframe></div>
-<div class="pane"><h2>After</h2><iframe id="a"></iframe></div></div>
+<div class="pane"><h2>Before</h2><div class="frame"><iframe id="b" title="before"></iframe></div></div>
+<div class="pane"><h2>After</h2><div class="frame"><iframe id="a" title="after"></iframe></div></div></div>
 <h2 style="margin:0 28px 6px;font-size:16px">All variants</h2>
 <table><tr><th>Email</th><th>Subject after</th><th></th><th></th><th></th></tr><tr><td>Order confirmation · NL</td><td><code>Je bestelling is bevestigd</code></td><td><a href="before/confirmation-nl.html">before</a></td><td><a href="after/confirmation-nl.html">after</a></td><td><a href="after/confirmation-nl.txt">text part</a></td></tr>
 <tr><td>Order confirmation · EN</td><td><code>Your order is confirmed</code></td><td><a href="before/confirmation-en.html">before</a></td><td><a href="after/confirmation-en.html">after</a></td><td><a href="after/confirmation-en.txt">text part</a></td></tr>
@@ -40,10 +46,40 @@ td,th{padding:8px 14px;border-bottom:1px solid #ebe6e3;text-align:left;vertical-
 <tr><td>Order confirmation, discovery set bought · NL</td><td><code>Je bestelling is bevestigd</code></td><td><a href="before/confirmation-discovery-nl.html">before</a></td><td><a href="after/confirmation-discovery-nl.html">after</a></td><td><a href="after/confirmation-discovery-nl.txt">text part</a></td></tr>
 <tr><td>Order confirmation, discovery set bought · EN</td><td><code>Your order is confirmed</code></td><td><a href="before/confirmation-discovery-en.html">before</a></td><td><a href="after/confirmation-discovery-en.html">after</a></td><td><a href="after/confirmation-discovery-en.txt">text part</a></td></tr></table>
 <script>
-const subjects={"confirmation-nl": "Je bestelling is bevestigd", "confirmation-en": "Your order is confirmed", "refund-nl": "Je terugbetaling is verwerkt", "refund-en": "Your refund has been processed", "cancelled-nl": "Je bestelling 70421 is geannuleerd", "cancelled-en": "Your order 70421 has been cancelled", "confirmation-discovery-nl": "Je bestelling is bevestigd", "confirmation-discovery-en": "Your order is confirmed"};
-const v=document.getElementById('v'),b=document.getElementById('b'),a=document.getElementById('a'),s=document.getElementById('subj'),panes=document.getElementById('panes');
-function load(){b.src='before/'+v.value+'.html';a.src='after/'+v.value+'.html';s.textContent='Subject: '+subjects[v.value];history.replaceState(null,'','#'+v.value)}
-v.addEventListener('change',load);
-document.querySelectorAll('button[data-w]').forEach(x=>x.addEventListener('click',()=>{document.querySelectorAll('button[data-w]').forEach(y=>y.classList.remove('on'));x.classList.add('on');panes.classList.toggle('mobile',x.dataset.w==='mobile')}));
-if(location.hash&&subjects[location.hash.slice(1)])v.value=location.hash.slice(1);load();
+const EMAIL_W = 632, PHONE_W = 375;
+const subjects = {"confirmation-nl": "Je bestelling is bevestigd", "confirmation-en": "Your order is confirmed", "refund-nl": "Je terugbetaling is verwerkt", "refund-en": "Your refund has been processed", "cancelled-nl": "Je bestelling 70421 is geannuleerd", "cancelled-en": "Your order 70421 has been cancelled", "confirmation-discovery-nl": "Je bestelling is bevestigd", "confirmation-discovery-en": "Your order is confirmed"};
+const v = document.getElementById('v'), s = document.getElementById('subj'), note = document.getElementById('note'), panes = document.getElementById('panes');
+const frames = [...document.querySelectorAll('.frame')];
+let mode = 'desktop';
+function fit() {
+  for (const f of frames) {
+    const iframe = f.querySelector('iframe');
+    const avail = mode === 'mobile' ? PHONE_W : f.parentElement.clientWidth;
+    const scale = Math.min(1, avail / EMAIL_W);
+    const docH = (() => { try { return iframe.contentDocument.documentElement.scrollHeight || 1600; } catch (e) { return 1600; } })();
+    iframe.style.height = docH + 'px';
+    iframe.style.transform = 'scale(' + scale + ')';
+    f.style.width = Math.round(EMAIL_W * scale) + 'px';
+    f.style.height = Math.round(docH * scale) + 'px';
+    try { iframe.contentWindow.scrollTo(0, 0); } catch (e) {}
+  }
+  note.textContent = mode === 'mobile'
+    ? 'Zoomed to fit a 375px screen (' + Math.round(PHONE_W / EMAIL_W * 100) + '%), which is what Gmail and Apple Mail do with this email on a phone.'
+    : '';
+}
+function load() {
+  document.getElementById('b').src = 'before/' + v.value + '.html';
+  document.getElementById('a').src = 'after/' + v.value + '.html';
+  s.textContent = 'Subject: ' + subjects[v.value];
+  history.replaceState(null, '', '#' + v.value);
+}
+v.addEventListener('change', load);
+document.querySelectorAll('button[data-w]').forEach(x => x.addEventListener('click', () => {
+  document.querySelectorAll('button[data-w]').forEach(y => y.classList.remove('on'));
+  x.classList.add('on'); mode = x.dataset.w; panes.classList.toggle('mobile', mode === 'mobile'); fit();
+}));
+for (const f of frames) f.querySelector('iframe').addEventListener('load', fit);
+window.addEventListener('resize', fit);
+if (location.hash && subjects[location.hash.slice(1)]) v.value = location.hash.slice(1);
+load(); fit();
 </script></body></html>
