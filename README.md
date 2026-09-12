@@ -10,6 +10,11 @@ lifecycle. The `.liquid` files can no longer run anywhere.
 To review the set, open **[`preview.html`](preview.html)**, which renders all seven inline. That
 is the link to share. [`index.html`](index.html) is the older card gallery and still works.
 
+**Approved copy, 12 September 2026:** the three store-sent emails were re-worded (EN + NL) on the
+same design. Before/after, desktop and mobile, all six variants:
+**[previews/2026-09-12-approved-copy/](https://petitemorg.github.io/email-templates/previews/2026-09-12-approved-copy/)**.
+The code is on branch `dan/order-email-copy` of `pm-medusa-store`, not yet merged.
+
 ---
 
 ## Who sends what

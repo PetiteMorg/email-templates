@@ -1,0 +1,13 @@
+SUBJECT: Your order 70421 has been cancelled
+
+Your order has been cancelled
+Your order has been successfully cancelled and will not be processed further.
+
+Already paid? The amount paid will automatically be refunded to your original payment method. Depending on your bank, it may take a few business days for the refund to appear.
+Order number: 70421
+Placed on: 12 September 2026
+Order total: € 150,95
+Cancelled order
+- Cherry Bomb (50ML) x2  € 78,00
+- 3x 50ML, Bundle x1  € 78,00
+If you didn’t cancel this order yourself or something doesn’t look right, simply reply to this email. We’ll be happy to help.

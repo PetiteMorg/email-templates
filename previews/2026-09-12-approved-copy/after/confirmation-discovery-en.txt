@@ -1,0 +1,18 @@
+SUBJECT: Your order is confirmed
+
+Thank you for your order
+We’ve received your order and are carefully preparing it for you. We’ll let you know as soon as your package is on its way.
+Order number: 70421
+Placed on: 12 September 2026
+Your order
+- Cherry Bomb (50ML) x2  € 78,00
+- 3x 50ML, Bundle x1  € 78,00
+Subtotal: € 156,00
+Shipping: € 4,95
+Total: € 150,95
+Shipping address: Fixture Customer, Teststraat 12-B, 1012 AB Amsterdam, NL
+View your order: https://petitemort.co/order/order_01FIXTURE
+What happens next?
+We’re carefully preparing your order for shipment. As soon as your package leaves our warehouse, you’ll receive your tracking link by email.
+
+You can then easily follow your order all the way to delivery.

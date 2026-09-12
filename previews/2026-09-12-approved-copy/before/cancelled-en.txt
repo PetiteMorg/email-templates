@@ -1,0 +1,10 @@
+SUBJECT: Order 70421 cancelled
+
+Your order has been cancelled
+Nothing will be shipped, and there is nothing for you to do. If a payment was taken it is being returned, and that can take a few working days to appear.
+Order number: 70421
+Order total: € 150,95
+What was cancelled
+- Cherry Bomb (50ML) x2  € 78,00
+- 3x 50ML, Bundle x1  € 78,00
+Reply to this email and we will look into it. Please keep the order number above in the message.

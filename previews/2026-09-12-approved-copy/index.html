@@ -1,0 +1,49 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Order emails · approved copy · 12 Sep 2026</title>
+<style>
+body{margin:0;font:15px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#2c2d2e;background:#efeae6}
+header{padding:22px 28px 14px;background:#fff;border-bottom:1px solid #ebe6e3}
+h1{margin:0 0 6px;font-size:20px} p{margin:4px 0;color:#57585a}
+.bar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:12px 28px;background:#faf7f5;border-bottom:1px solid #ebe6e3}
+select,button{font:inherit;padding:7px 10px;border:1px solid #d8d2ce;border-radius:8px;background:#fff}
+button.on{background:#2c2d2e;color:#fff;border-color:#2c2d2e}
+.panes{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:18px 28px}
+.pane h2{margin:0 0 8px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#8a8a8a}
+iframe{width:100%;height:1400px;border:1px solid #ebe6e3;border-radius:12px;background:#efeae6}
+.panes.mobile iframe{width:375px;justify-self:start}
+table{border-collapse:collapse;margin:8px 28px 40px;background:#fff;border-radius:12px;overflow:hidden}
+td,th{padding:8px 14px;border-bottom:1px solid #ebe6e3;text-align:left;vertical-align:top} code{font-size:13px}
+@media (max-width:900px){.panes{grid-template-columns:1fr}}
+</style></head><body>
+<header><h1>Petite Mort order emails, approved copy of 12 September 2026</h1>
+<p>Left: what production sends today. Right: the approved wording, on the identical design. Rendered from fixture data (order 70421); no real customer appears anywhere.</p></header>
+<div class="bar"><label>Email <select id="v"><option value="confirmation-nl">Order confirmation · NL</option>
+<option value="confirmation-en">Order confirmation · EN</option>
+<option value="refund-nl">Refund · NL</option>
+<option value="refund-en">Refund · EN</option>
+<option value="cancelled-nl">Cancellation · NL</option>
+<option value="cancelled-en">Cancellation · EN</option>
+<option value="confirmation-discovery-nl">Order confirmation, discovery set bought · NL</option>
+<option value="confirmation-discovery-en">Order confirmation, discovery set bought · EN</option></select></label>
+<button id="w" class="on" data-w="desktop">Desktop</button><button data-w="mobile">Mobile 375px</button>
+<span id="subj" style="color:#57585a"></span></div>
+<div class="panes" id="panes">
+<div class="pane"><h2>Before</h2><iframe id="b"></iframe></div>
+<div class="pane"><h2>After</h2><iframe id="a"></iframe></div></div>
+<h2 style="margin:0 28px 6px;font-size:16px">All variants</h2>
+<table><tr><th>Email</th><th>Subject after</th><th></th><th></th><th></th></tr><tr><td>Order confirmation · NL</td><td><code>Je bestelling is bevestigd</code></td><td><a href="before/confirmation-nl.html">before</a></td><td><a href="after/confirmation-nl.html">after</a></td><td><a href="after/confirmation-nl.txt">text part</a></td></tr>
+<tr><td>Order confirmation · EN</td><td><code>Your order is confirmed</code></td><td><a href="before/confirmation-en.html">before</a></td><td><a href="after/confirmation-en.html">after</a></td><td><a href="after/confirmation-en.txt">text part</a></td></tr>
+<tr><td>Refund · NL</td><td><code>Je terugbetaling is verwerkt</code></td><td><a href="before/refund-nl.html">before</a></td><td><a href="after/refund-nl.html">after</a></td><td><a href="after/refund-nl.txt">text part</a></td></tr>
+<tr><td>Refund · EN</td><td><code>Your refund has been processed</code></td><td><a href="before/refund-en.html">before</a></td><td><a href="after/refund-en.html">after</a></td><td><a href="after/refund-en.txt">text part</a></td></tr>
+<tr><td>Cancellation · NL</td><td><code>Je bestelling 70421 is geannuleerd</code></td><td><a href="before/cancelled-nl.html">before</a></td><td><a href="after/cancelled-nl.html">after</a></td><td><a href="after/cancelled-nl.txt">text part</a></td></tr>
+<tr><td>Cancellation · EN</td><td><code>Your order 70421 has been cancelled</code></td><td><a href="before/cancelled-en.html">before</a></td><td><a href="after/cancelled-en.html">after</a></td><td><a href="after/cancelled-en.txt">text part</a></td></tr>
+<tr><td>Order confirmation, discovery set bought · NL</td><td><code>Je bestelling is bevestigd</code></td><td><a href="before/confirmation-discovery-nl.html">before</a></td><td><a href="after/confirmation-discovery-nl.html">after</a></td><td><a href="after/confirmation-discovery-nl.txt">text part</a></td></tr>
+<tr><td>Order confirmation, discovery set bought · EN</td><td><code>Your order is confirmed</code></td><td><a href="before/confirmation-discovery-en.html">before</a></td><td><a href="after/confirmation-discovery-en.html">after</a></td><td><a href="after/confirmation-discovery-en.txt">text part</a></td></tr></table>
+<script>
+const subjects={"confirmation-nl": "Je bestelling is bevestigd", "confirmation-en": "Your order is confirmed", "refund-nl": "Je terugbetaling is verwerkt", "refund-en": "Your refund has been processed", "cancelled-nl": "Je bestelling 70421 is geannuleerd", "cancelled-en": "Your order 70421 has been cancelled", "confirmation-discovery-nl": "Je bestelling is bevestigd", "confirmation-discovery-en": "Your order is confirmed"};
+const v=document.getElementById('v'),b=document.getElementById('b'),a=document.getElementById('a'),s=document.getElementById('subj'),panes=document.getElementById('panes');
+function load(){b.src='before/'+v.value+'.html';a.src='after/'+v.value+'.html';s.textContent='Subject: '+subjects[v.value];history.replaceState(null,'','#'+v.value)}
+v.addEventListener('change',load);
+document.querySelectorAll('button[data-w]').forEach(x=>x.addEventListener('click',()=>{document.querySelectorAll('button[data-w]').forEach(y=>y.classList.remove('on'));x.classList.add('on');panes.classList.toggle('mobile',x.dataset.w==='mobile')}));
+if(location.hash&&subjects[location.hash.slice(1)])v.value=location.hash.slice(1);load();
+</script></body></html>

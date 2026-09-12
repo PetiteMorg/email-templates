@@ -1,0 +1,8 @@
+SUBJECT: Refund sent for order 70421
+
+Your refund is on its way
+We have sent it back to the card or account you paid with. Banks take their own time, so allow a few working days for it to show up.
+Refunded: € 39,00
+Order number: 70421
+Original order total: € 150,95
+If the amount looks wrong, reply to this email with the order number and we will check it.

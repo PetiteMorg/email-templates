@@ -1,0 +1,8 @@
+SUBJECT: Your refund has been processed
+
+Your refund has been processed
+We’ve refunded the amount to the original payment method used for your order. Depending on your bank, it may take a few business days for the refund to appear.
+Refunded: € 39,00
+Order number: 70421
+Original order total: € 150,95
+If the refunded amount doesn’t look right or you have another question about your order, simply reply to this email. We’ll be happy to look into it for you.
