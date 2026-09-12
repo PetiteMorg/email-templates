@@ -47,7 +47,7 @@ td,th{padding:8px 14px;border-bottom:1px solid #ebe6e3;text-align:left;vertical-
 <tr><td>Order confirmation, discovery set bought · NL</td><td><code>Je bestelling is bevestigd</code></td><td><a href="before/confirmation-discovery-nl.html">before</a></td><td><a href="after/confirmation-discovery-nl.html">after</a></td><td><a href="after/confirmation-discovery-nl.txt">text part</a></td></tr>
 <tr><td>Order confirmation, discovery set bought · EN</td><td><code>Your order is confirmed</code></td><td><a href="before/confirmation-discovery-en.html">before</a></td><td><a href="after/confirmation-discovery-en.html">after</a></td><td><a href="after/confirmation-discovery-en.txt">text part</a></td></tr></table>
 <script>
-const EMAIL_W = 632, PHONE_W = 375;
+const EMAIL_W = 632, PHONE_W = 375, VERSION = '2026-09-12-3';
 const subjects = {"confirmation-nl": "Je bestelling is bevestigd", "confirmation-en": "Your order is confirmed", "refund-nl": "Je terugbetaling is verwerkt", "refund-en": "Your refund has been processed", "cancelled-nl": "Je bestelling 70421 is geannuleerd", "cancelled-en": "Your order 70421 has been cancelled", "confirmation-discovery-nl": "Je bestelling is bevestigd", "confirmation-discovery-en": "Your order is confirmed"};
 const v = document.getElementById('v'), s = document.getElementById('subj'), note = document.getElementById('note'), panes = document.getElementById('panes');
 const frames = [...document.querySelectorAll('.frame')];
@@ -69,8 +69,10 @@ function fit() {
     : '';
 }
 function load() {
-  document.getElementById('b').src = 'before/' + v.value + '.html';
-  document.getElementById('a').src = 'after/' + v.value + '.html';
+  // Pages serves these files with a ten-minute cache; the version tag makes a republished
+  // preview show up on the first reload instead of the eleventh minute.
+  document.getElementById('b').src = 'before/' + v.value + '.html?v=' + VERSION;
+  document.getElementById('a').src = 'after/' + v.value + '.html?v=' + VERSION;
   s.textContent = 'Subject: ' + subjects[v.value];
   history.replaceState(null, '', '#' + v.value);
 }
